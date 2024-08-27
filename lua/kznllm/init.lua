@@ -225,12 +225,4 @@ function M.invoke_llm(prompt_messages, make_job_fn, opts)
   end)
 end
 
-api.nvim_set_keymap('n', '<Esc>', '', {
-  noremap = true,
-  silent = true,
-  callback = function()
-    api.nvim_exec_autocmds('User', { pattern = 'LLM_Escape' })
-  end,
-})
-
 return M
