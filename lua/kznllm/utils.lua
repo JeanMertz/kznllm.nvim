@@ -66,14 +66,16 @@ end
 ---
 ---Retrieves project files based on the context directory identifier in the current working directory.
 ---
+---@param opts { context_root_id: string }? optional values including context root id
 ---@return { path: string, content: string }? context_files list of files in the context directory
-function M.get_project_files()
+function M.get_project_files(opts)
   if vim.fn.executable('fd') ~= 1 then
     -- only use project mode if `fd` is available
     return
   end
 
-  local fd_dir_result = vim.system({ 'fd', '-td', '-HI', '.kzn', '-1' }):wait()
+  local root = opts and opts.context_root_id or '.kzn'
+  local fd_dir_result = vim.system({ 'fd', '-td', '-HI', root, '-1' }):wait()
   local context_dir = vim.trim(fd_dir_result.stdout)
 
   -- do not respect `.gitignore`, look for hidden

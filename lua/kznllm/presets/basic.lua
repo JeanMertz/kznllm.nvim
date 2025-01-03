@@ -12,7 +12,7 @@ local M = {}
 ---@class BaseTask
 ---@field id string
 ---@field description string
----@field invoke fun(opts: { debug: boolean, progress_fn: fun(state) })
+---@field invoke fun(opts: { debug: boolean, progress_fn: fun(state), context_root_id: string })
 
 ---@param config { id: string, description: string, preset_builder: OpenAIPresetBuilder | AnthropicPresetBuilder }
 local function NewBaseTask(config)
@@ -20,8 +20,13 @@ local function NewBaseTask(config)
     id = config.id,
     description = config.description,
     invoke = function(opts)
+      local selection, replace = utils.get_visual_selection(opts)
+
       vim.ui.input({ prompt = 'prompt: ' }, function(user_query)
-        local selection, replace = utils.get_visual_selection(opts)
+        -- aborted (nil) or empty query
+        if user_query == nil or user_query == '' then
+          return
+        end
 
         local current_buf_id = api.nvim_get_current_buf()
         local current_buffer_context = buffer_manager:get_buffer_context(current_buf_id)
@@ -36,7 +41,7 @@ local function NewBaseTask(config)
           visual_selection = selection,
           current_buffer_context = current_buffer_context,
           replace = replace,
-          context_files = utils.get_project_files(),
+          context_files = utils.get_project_files(opts.context_root_id),
         }
 
         local curl_options = config.preset_builder:build(prompt_args)
