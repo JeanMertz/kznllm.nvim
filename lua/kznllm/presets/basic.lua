@@ -41,7 +41,7 @@ local function NewBaseTask(config)
           visual_selection = selection,
           current_buffer_context = current_buffer_context,
           replace = replace,
-          context_files = utils.get_project_files(opts.context_root_id),
+          context_files = utils.get_project_files(opts),
         }
 
         local curl_options = config.preset_builder:build(prompt_args)
